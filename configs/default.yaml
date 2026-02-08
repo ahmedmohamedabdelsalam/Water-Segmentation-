@@ -1,0 +1,76 @@
+# Default configuration for water segmentation training
+
+# Data paths
+data:
+  images_dir: "data/data/images"
+  labels_dir: "data/data/labels"
+  train_split: 0.7
+  val_split: 0.15
+  test_split: 0.15
+
+# Model architecture
+model:
+  type: "enhanced_unet"  # Options: baseline_unet, enhanced_unet
+  in_channels: 12
+  out_channels: 1
+  init_features: 64
+  dropout_rate: 0.3
+
+# Training hyperparameters
+training:
+  batch_size: 8
+  num_epochs: 100
+  learning_rate: 0.0005
+  weight_decay: 0.0001
+  gradient_clip_max_norm: 0.5
+  
+  # Loss function
+  loss_type: "combined"  # Options: dice, bce, combined
+  loss_weights:
+    bce: 0.5
+    dice: 0.5
+  
+  # Learning rate scheduling
+  lr_scheduler:
+    type: "ReduceLROnPlateau"
+    mode: "min"
+    factor: 0.5
+    patience: 10
+    min_lr: 0.00001
+  
+  # Early stopping
+  early_stopping:
+    patience: 15
+    min_delta: 0.001
+    metric: "val_dice"  # Metric to monitor
+
+# Data augmentation
+augmentation:
+  train:
+    enable: true
+    horizontal_flip: 0.5
+    vertical_flip: 0.5
+    rotation_90: 0.5
+    # Additional augmentations can be added
+  
+  val:
+    enable: false
+  
+  test:
+    enable: false
+
+# Reproducibility
+seed: 42
+
+# Logging
+logging:
+  log_interval: 10  # Log every N batches
+  save_dir: "experiments"
+  tensorboard: true
+  save_checkpoints: true
+  checkpoint_interval: 5  # Save every N epochs
+
+# Hardware
+device: "cuda"  # Options: cuda, cpu, auto
+num_workers: 4
+pin_memory: true
